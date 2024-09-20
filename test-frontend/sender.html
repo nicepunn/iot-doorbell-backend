@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sender</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+
+      #image-upload {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Upload an Image (Rasberry Pi)</h1>
+    <input
+      type="file"
+      class="image-upload"
+      id="image-upload"
+      accept="image/*"
+    />
+    <p>Status:</p>
+    <p id="status"></p>
+
+    <script>
+      // Connect to WebSocket as sender
+      const ws = new WebSocket("ws://localhost:8080/ws?type=sender");
+      const imageInput = document.getElementById("image-upload");
+      const status = document.getElementById("status");
+
+      ws.onmessage = function (event) {
+        if (event.data === "accept") {
+          status.textContent = "Your image was accepted!";
+        } else if (event.data === "reject") {
+          status.textContent = "Your image was rejected!";
+        }
+      };
+
+      imageInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const arrayBuffer = e.target.result;
+            ws.send(arrayBuffer);
+            status.textContent = "Image sent to the receiver.";
+          };
+          reader.readAsArrayBuffer(file);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receiver</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+
+      .image {
+        max-width: 100%;
+        max-height: 400px;
+        display: block;
+        margin: 20px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Receive Image (Frontend)</h1>
+    <img class="image" id="image" alt="No image received yet" />
+    <button id="accept">Accept</button>
+    <button id="reject">Reject</button>
+
+    <script>
+      // Connect to WebSocket as receiver
+      const ws = new WebSocket("ws://localhost:8080/ws?type=receiver");
+      const imageEl = document.getElementById("image");
+      const acceptButton = document.getElementById("accept");
+      const rejectButton = document.getElementById("reject");
+
+      ws.onmessage = function (event) {
+        if (event.data instanceof Blob) {
+          const blob = event.data;
+          const url = URL.createObjectURL(blob);
+          imageEl.src = url;
+        }
+      };
+
+      acceptButton.addEventListener("click", function () {
+        ws.send("accept");
+      });
+
+      rejectButton.addEventListener("click", function () {
+        ws.send("reject");
+      });
+    </script>
+  </body>
+</html>
