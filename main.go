@@ -42,9 +42,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 
 	for {
-		log.Printf("%s waiting for message\n", clientType)
 		messageType, msg, err := conn.ReadMessage()
-		log.Printf("%s recieved message\n", clientType)
 		if err != nil {
 			log.Println("Read error:", err)
 			break
@@ -52,7 +50,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 		if clientType == "sender" {
 			fmt.Printf("sender %d", messageType)
-			if receiverConn != nil {
+				fmt.Println(msg)
 				err = receiverConn.WriteMessage(messageType, msg)
 				if err != nil {
 					log.Println("Error sending image to receiver:", err)
@@ -66,7 +64,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 						}
 					}
 				}
-			}
+			
 		} else if clientType == "receiver" {
 			fmt.Printf("reciever %d", messageType)
 			if senderConn != nil {
